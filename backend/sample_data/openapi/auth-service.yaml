@@ -1,0 +1,43 @@
+openapi: "3.0.3"
+info:
+  title: Auth Service
+  version: "1.0.0"
+  description: Handles user authentication and JWT issuance
+x-service-metadata:
+  language: python
+  has_metrics: false
+  has_logging: true
+  dependencies: []
+servers:
+  - url: http://auth-service:8001
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /auth/login:
+    post:
+      summary: Login and receive JWT
+      responses:
+        "200":
+          description: JWT token
+  /auth/validate:
+    post:
+      summary: Validate a JWT token
+      responses:
+        "200":
+          description: Token claims
+  /auth/refresh:
+    post:
+      summary: Refresh an expiring token
+      responses:
+        "200":
+          description: New JWT
+  /users:
+    get:
+      summary: List users (admin)
+      responses:
+        "200":
+          description: User list

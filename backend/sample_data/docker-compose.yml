@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+  auth-service:
+    build: ./auth-service
+    image: mareana/auth-service:latest
+    ports:
+      - "8001:8001"
+    environment:
+      - DB_URL=postgresql://postgres:password@postgres:5432/auth
+      - JWT_SECRET=supersecret
+      - LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+    networks:
+      - internal
+
+  reporting-service:
+    build: ./reporting-service
+    image: mareana/reporting-service:latest
+    ports:
+      - "8002:8002"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - ANALYTICS_SERVICE_URL=http://analytics-service:8004
+      - DB_URL=postgresql://postgres:password@postgres:5432/reporting
+      - LOG_LEVEL=INFO
+    depends_on:
+      - auth-service
+      - analytics-service
+    networks:
+      - internal
+
+  notification-service:
+    build: ./notification-service
+    image: mareana/notification-service:latest
+    ports:
+      - "8003:8003"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - SMTP_HOST=smtp.mailgun.org
+      - LOG_LEVEL=INFO
+    depends_on:
+      - auth-service
+    networks:
+      - internal
+
+  analytics-service:
+    build: ./analytics-service
+    image: mareana/analytics-service:latest
+    ports:
+      - "8004:8004"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - LOG_LEVEL=INFO
+    depends_on:
+      - auth-service
+    networks:
+      - internal
+
+  frontend:
+    build: ./frontend
+    image: mareana/frontend:latest
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_AUTH_API_URL=http://localhost:8001
+      - VITE_REPORTING_API_URL=http://localhost:8002
+      - VITE_NOTIFICATION_API_URL=http://localhost:8003
+      - VITE_ANALYTICS_API_URL=http://localhost:8004
+    depends_on:
+      - auth-service
+      - reporting-service
+      - notification-service
+      - analytics-service
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

@@ -1,0 +1,42 @@
+openapi: "3.0.3"
+info:
+  title: Reporting Service
+  version: "1.0.0"
+  description: Generates and serves reports based on analytics data
+x-service-metadata:
+  language: python
+  has_metrics: false
+  has_logging: true
+  dependencies:
+    - target: auth-service
+      endpoints_called: ["/auth/validate"]
+      protocol: REST
+    - target: analytics-service
+      endpoints_called: ["/events/aggregate", "/events/summary"]
+      protocol: REST
+servers:
+  - url: http://reporting-service:8002
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /reports:
+    get:
+      summary: List reports
+      responses:
+        "200":
+          description: Report list
+    post:
+      summary: Generate a new report
+      responses:
+        "202":
+          description: Report queued
+  /reports/{id}:
+    get:
+      summary: Get report by ID
+      responses:
+        "200":
+          description: Report data

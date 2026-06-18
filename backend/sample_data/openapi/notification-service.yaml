@@ -1,0 +1,34 @@
+openapi: "3.0.3"
+info:
+  title: Notification Service
+  version: "1.0.0"
+  description: Sends email and push notifications
+x-service-metadata:
+  language: python
+  has_metrics: false
+  has_logging: false
+  dependencies:
+    - target: auth-service
+      endpoints_called: ["/auth/validate", "/users"]
+      protocol: REST
+servers:
+  - url: http://notification-service:8003
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /notifications/email:
+    post:
+      summary: Send email notification
+      responses:
+        "202":
+          description: Queued
+  /notifications/push:
+    post:
+      summary: Send push notification
+      responses:
+        "202":
+          description: Queued

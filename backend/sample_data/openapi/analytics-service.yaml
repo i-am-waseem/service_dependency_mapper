@@ -1,0 +1,40 @@
+openapi: "3.0.3"
+info:
+  title: Analytics Service
+  version: "1.0.0"
+  description: Ingests and aggregates event data
+x-service-metadata:
+  language: python
+  has_metrics: true
+  has_logging: true
+  dependencies:
+    - target: auth-service
+      endpoints_called: ["/auth/validate"]
+      protocol: REST
+servers:
+  - url: http://analytics-service:8004
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /events:
+    post:
+      summary: Ingest an event
+      responses:
+        "201":
+          description: Event recorded
+  /events/aggregate:
+    get:
+      summary: Aggregate events by type/time
+      responses:
+        "200":
+          description: Aggregated data
+  /events/summary:
+    get:
+      summary: Summary statistics
+      responses:
+        "200":
+          description: Summary
